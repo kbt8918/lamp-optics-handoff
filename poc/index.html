@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%}
+body{font-family:'Malgun Gothic','Noto Sans KR','Apple SD Gothic Neo',sans-serif;font-size:13px;color:#1a1a1a;background:#c9ced4}
+a{color:#005a9e}a:hover{color:#003e6e}
+table{border-collapse:collapse}
+th,td{padding:5px 9px;border:1px solid #d6d6d6;text-align:left;white-space:nowrap}
+th{background:#ececec;font-weight:600}
+tbody tr:hover td{background:#e8f1fa}
+button:disabled{opacity:.45;cursor:default}
+button,input,select{font-family:inherit;font-size:13px}
+button:not(:disabled):hover{filter:brightness(.95)}
+@keyframes om-bar{from{background-position:0 0}to{background-position:28px 0}}
+</style>
+</helmet>
+<div style="height:100vh;min-height:560px;display:flex;flex-direction:column;background:#c9ced4">
+  <div style="height:30px;background:#fafafa;border-bottom:1px solid #c8c8c8;display:flex;align-items:center;justify-content:space-between;padding:0 0 0 12px;flex:none">
+    <div style="font-size:12.5px">램프광학 설계정보 및 산출물 통합관리 (PoC)</div>
+    <div style="display:flex;color:#444;font-size:13px"><span style="width:44px;text-align:center">─</span><span style="width:44px;text-align:center">☐</span><span style="width:44px;text-align:center">✕</span></div>
+  </div>
+  <div style="flex:1;position:relative;display:flex;min-height:0;background:#f3f3f3">
+    <div style="width:200px;flex:none;border-right:1px solid #c8c8c8;background:#f9f9f9;padding:8px 0;overflow:auto;box-sizing:border-box">
+      <sc-for list="{{ menu }}" as="m" hint-placeholder-count="6"><div style="{{ m.style }}" onClick="{{ m.onClick }}">{{ m.label }}</div></sc-for>
+    </div>
+    <sc-for list="{{ layers }}" as="l" hint-placeholder-count="1">
+      <div style="{{ l.wrap }}">
+        <div style="{{ l.box }}">
+          <sc-if value="{{ l.isModal }}">
+            <div style="height:30px;background:#fafafa;border-bottom:1px solid #c8c8c8;display:flex;align-items:center;justify-content:space-between;padding-left:12px;font-weight:600;flex:none">
+              <span>{{ l.title }}</span>
+              <sc-if value="{{ l.hasClose }}"><span style="width:40px;text-align:center;cursor:pointer" onClick="{{ l.onClose }}">✕</span></sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ l.isPage }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px 0">
+              <div style="font-size:16px;font-weight:600">{{ l.title }}</div>
+              <sc-if value="{{ l.hasBack }}"><button style="height:26px;padding:0 12px;background:#fdfdfd;border:1px solid #8a8a8a;border-radius:3px;cursor:pointer" onClick="{{ l.onBack }}">{{ l.backLabel }}</button></sc-if>
+            </div>
+          </sc-if>
+          <div style="{{ l.inner }}">
+            <sc-for list="{{ l.sections }}" as="s">
+              <div style="{{ s.wrap }}">
+                <sc-if value="{{ s.hasTitle }}"><div style="font-weight:600;margin-bottom:8px">[ {{ s.title }} ]</div></sc-if>
+                <sc-if value="{{ s.isForm }}">
+                  <div style="{{ s.fStyle }}">
+                    <sc-for list="{{ s.fields }}" as="f">
+                      <div style="{{ f.rowStyle }}">
+                        <sc-if value="{{ f.hasLabel }}"><label style="{{ f.lblStyle }}">{{ f.labelText }}</label></sc-if>
+                        <div style="min-width:0">
+                          <sc-if value="{{ f.isText }}"><input type="text" value="{{ f.value }}" onChange="{{ f.onChange }}" disabled="{{ f.ro }}" style="{{ f.inStyle }}"></sc-if>
+                          <sc-if value="{{ f.isPass }}"><input type="password" value="{{ f.value }}" onChange="{{ f.onChange }}" style="{{ f.inStyle }}"></sc-if>
+                          <sc-if value="{{ f.isDate }}"><input type="date" value="{{ f.value }}" onChange="{{ f.onChange }}" style="{{ f.inStyle }}"></sc-if>
+                          <sc-if value="{{ f.isSelect }}"><select value="{{ f.value }}" onChange="{{ f.onChange }}" disabled="{{ f.ro }}" style="{{ f.inStyle }}"><sc-for list="{{ f.options }}" as="o"><option value="{{ o.v }}">{{ o.t }}</option></sc-for></select></sc-if>
+                          <sc-if value="{{ f.isCheck }}"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked="{{ f.checked }}" onChange="{{ f.onChange }}" disabled="{{ f.ro }}">{{ f.checkText }}</label></sc-if>
+                          <sc-if value="{{ f.isStatic }}"><div style="padding-top:4px">{{ f.value }}</div></sc-if>
+                          <sc-if value="{{ f.hasErr }}"><div style="color:#b42318;font-size:12.5px;margin-top:3px">✖ {{ f.error }}</div></sc-if>
+                          <sc-if value="{{ f.hasHint }}"><div style="color:#5c5c5c;font-size:12px;margin-top:3px">{{ f.hint }}</div></sc-if>
+                        </div>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ s.hasTrail }}"><div style="margin-left:auto;color:#333">{{ s.trail }}</div></sc-if>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isKv }}">
+                  <div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:5px 10px;font-size:12.5px">
+                    <sc-for list="{{ s.lines }}" as="m"><div style="color:#5c5c5c">{{ m.k }}</div><div style="{{ m.vs }}">{{ m.v }}</div></sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isText }}">
+                  <div style="display:flex;flex-direction:column;gap:3px"><sc-for list="{{ s.lines }}" as="m"><div style="{{ m.ts }}">{{ m.t }}</div></sc-for></div>
+                </sc-if>
+                <sc-if value="{{ s.isBox }}">
+                  <div style="{{ s.boxStyle }}">
+                    <div style="font-weight:600">{{ s.head }}</div>
+                    <sc-for list="{{ s.lines }}" as="m"><div style="{{ m.ts }}">{{ m.t }}</div></sc-for>
+                    <sc-if value="{{ s.busy }}"><div style="height:8px;margin-top:4px;border:1px solid #8a8a8a;background:repeating-linear-gradient(90deg,#0067c0 0 14px,#fff 14px 28px);animation:om-bar .6s linear infinite"></div></sc-if>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isTable }}">
+                  <div style="border:1px solid #adadad;background:#fff;overflow:auto;max-width:100%">
+                    <table style="width:100%;font-size:12.5px">
+                      <thead><tr><sc-for list="{{ s.cols }}" as="c"><th>{{ c.h }}</th></sc-for></tr></thead>
+                      <tbody>
+                        <sc-for list="{{ s.rows }}" as="r">
+                          <tr style="{{ r.style }}" onClick="{{ r.onClick }}">
+                            <sc-for list="{{ r.cells }}" as="c">
+                              <td style="{{ c.style }}">
+                                <sc-if value="{{ c.hasBtn }}"><button style="height:22px;padding:0 10px;background:#fdfdfd;border:1px solid #8a8a8a;border-radius:3px;cursor:pointer" onClick="{{ c.onBtn }}">{{ c.btn }}</button></sc-if>
+                                <sc-if value="{{ c.noBtn }}">{{ c.t }}</sc-if>
+                              </td>
+                            </sc-for>
+                          </tr>
+                        </sc-for>
+                      </tbody>
+                    </table>
+                    <sc-if value="{{ s.isEmpty }}"><div style="padding:18px;text-align:center;color:#5c5c5c">{{ s.empty }}</div></sc-if>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isBtns }}">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ s.left }}" as="b"><button style="{{ b.style }}" disabled="{{ b.disabled }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for></div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ s.right }}" as="b"><button style="{{ b.style }}" disabled="{{ b.disabled }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for></div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="height:28px;flex:none;background:#fafafa;border-top:1px solid #c8c8c8;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 12px;font-size:12.5px">
+    <div style="display:flex;gap:14px"><span>{{ userText }}</span><span>서버: {{ serverText }}</span><span>DB: {{ dbText }}</span></div>
+    <button style="height:22px;padding:0 12px;background:#fdfdfd;border:1px solid #8a8a8a;border-radius:3px;cursor:pointer" disabled="{{ noUser }}" onClick="{{ logout }}">로그아웃</button>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const INK='#1a1a1a',MUT='#5c5c5c',OK='#1e7a34',ERR='#b42318',WARN='#8a5a00';
+const FILES=[
+ {n:'headlamp_sim_v3.xmp',s:12582912},
+ {n:'rear_beam_pattern.pf',s:4718592},
+ {n:'광학 해석 보고서.pdf',s:3145728},
+ {n:'review_notes.docx',s:88000},
+ {n:'empty_log.txt',s:0},
+ {n:'headlamp_sim_v3_전송손상.xmp',s:12582912,bad:true}
+];
+const KINDS=['시뮬레이션결과','측정결과','검토서','도면','기타'];
+const STAGES=['개념','DV','PV'];
+const hx=s=>{let h=2166136261,o='';for(let i=0;o.length<64;i++){h^=s.charCodeAt(i%s.length)+i;h=Math.imul(h,16777619)>>>0;o+=h.toString(16).padStart(8,'0');}return o.slice(0,64);};
+const fmt=b=>b>=1048576?(b/1048576).toFixed(2)+' MB':b>=1024?(b/1024).toFixed(1)+' KB':b+' B';
+const num=n=>n.toLocaleString('en-US');
+const now=()=>{const d=new Date();return '2027-05-12 '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+const V=(id,ver,file,size,by,at)=>({id,ver,file,size,sha:hx(file+size),by,at,active:true});
+const OPLBL={LOGIN_SUCCESS:'로그인 성공',LOGIN_FAIL:'로그인 실패',LOGOUT:'로그아웃',FILE_UPLOAD:'파일 등록',FILE_DOWNLOAD:'파일 다운로드',ACCESS_DENIED:'권한 거부',SYSTEM_ERROR:'시스템 오류'};
+const ROLE={ADMIN:'관리자',USER:'일반 사용자'};
+const P=(id,name,code,lamp,phase,owner,created,params)=>({id,name,code,lamp,phase,owner,note:'',active:true,created,params:params||{d:'',o:'',m:'',n:'',f5:'',f6:'',f7:'',f8:'',f9:'',f10:''}});
+
+class Component extends DCLogic {
+  state={
+    screen:'login',user:null,pid:null,aid:null,vid:null,row:null,modal:null,confirm:null,msg:null,nid:100,
+    projects:[
+      P(1,'XX차종 헤드램프','XX-HL','헤드램프','DV','홍길동','2027-03-10 10:00',{d:'A타입',o:'리플렉터',m:'XX사',n:'24',f5:'',f6:'',f7:'',f8:'',f9:'',f10:''}),
+      P(2,'YY차종 리어램프','YY-RL','리어램프','PV','김철수','2027-03-15 09:30'),
+      P(3,'ZZ차종 DRL','ZZ-DR','DRL','개념','홍길동','2027-04-01 14:00')],
+    assets:[
+      {id:1,name:'헤드램프 광학 시뮬레이션 결과',pid:1,kind:'시뮬레이션결과',stage:'DV',active:true,latest:12,versions:[V(12,'v2','headlamp_sim_v2.xmp',10485760,'홍길동','2027-04-10 11:00'),V(11,'v1','headlamp_sim.xmp',10244000,'홍길동','2027-04-01 09:00')]},
+      {id:2,name:'리어램프 배광 측정',pid:2,kind:'측정결과',stage:'PV',active:true,latest:null,versions:[V(21,'v1','rear_meas.xlsx',2516582,'김철수','2027-04-05 16:10')]},
+      {id:3,name:'광학 설계 검토서',pid:1,kind:'검토서',stage:'DV',active:true,latest:31,versions:[V(31,'v1','optics_review.pdf',3250585,'홍길동','2027-03-28 13:20')]},
+      {id:4,name:'구 광학 검토서',pid:1,kind:'검토서',stage:'DV',active:false,latest:41,off:'2027-04-12 15:20',offBy:'홍길동',versions:[V(41,'v1','old_review.pdf',1887436,'홍길동','2027-03-12 10:00')]}],
+    users:[{id:'admin',name:'관리자',role:'ADMIN',active:true,at:'2027-03-01'},{id:'designer01',name:'홍길동',role:'USER',active:true,at:'2027-03-01'},{id:'designer02',name:'김철수',role:'USER',active:true,at:'2027-03-05'}],
+    exts:['xmp','pf','pdf','pptx','xlsx','txt','zip','jpg','png'].map(e=>({ext:e,active:true})),
+    logs:[
+      {at:'2027-05-12 09:00',u:'designer01',op:'LOGIN_SUCCESS',t:'designer01',ok:true},
+      {at:'2027-05-12 09:05',u:'designer02',op:'LOGIN_FAIL',t:'designer02',ok:false,code:'E-AUTH-401',msg:'인증 실패'},
+      {at:'2027-05-12 09:20',u:'designer01',op:'FILE_DOWNLOAD',t:'ver=12',ok:true}].reverse(),
+    ui:{prjQ:'',off:false,aF:'all',sk:'date',sd:'desc',sq:{name:'',p:'all',k:'all',from:'',to:''},applied:null,sErr:'',ext:'',extErr:''},
+    lf:{id:'',pw:''},lerr:null,pf:{},pe:{},df:{},de:{},up:null,uf:{},ue:{}
+  };
+  go=(screen,x={})=>this.setState(s=>({screen,msg:null,row:null,modal:null,confirm:null,ui:{...s.ui,sk:'date',sd:'desc'},...x}));
+  ui=k=>e=>{const v=e.target.type==='checkbox'?e.target.checked:e.target.value;this.setState(s=>({ui:{...s.ui,[k]:v}}));};
+  sq=k=>e=>{const v=e.target.value;this.setState(s=>({ui:{...s.ui,sq:{...s.ui.sq,[k]:v}}}));};
+  frm=(f,k)=>e=>{const v=e.target.type==='checkbox'?e.target.checked:e.target.value;this.setState(s=>({[f]:{...s[f],[k]:v}}));};
+  log=(op,t,ok=true,code='',msg='')=>this.setState(s=>({logs:[{at:now(),u:s.user?s.user.id:'-',op,t,ok,code,msg},...s.logs]}));
+  ok=text=>this.setState({msg:{k:'ok',text}});
+  fld(label,value,onChange,o={}){const k=o.k||'text',inl=o.inl;
+    return {label,labelText:label+(o.req?' *':''),hasLabel:!!label&&k!=='check',value:value??'',onChange,checked:!!value,checkText:label,
+      isText:k==='text',isPass:k==='pass',isDate:k==='date',isSelect:k==='select',isCheck:k==='check',isStatic:k==='static',
+      options:(o.opts||[]).map(x=>typeof x==='string'?{v:x,t:x}:x),ro:!!o.ro,error:o.err||'',hasErr:!!o.err,hint:o.hint||'',hasHint:!!o.hint,
+      rowStyle:inl?'display:flex;align-items:center;gap:6px':'display:grid;grid-template-columns:130px minmax(0,1fr);gap:10px;align-items:start',
+      lblStyle:'font-size:13px;'+(inl?'':'padding-top:4px'),
+      inStyle:'height:26px;border:1px solid '+(o.err?ERR:'#8a8a8a')+';background:'+(o.ro?'#ececec':'#fff')+';padding:0 6px;color:#1a1a1a;box-sizing:border-box;width:'+(o.w||(inl?'180px':'100%'))+';max-width:100%'};}
+  L=a=>a.map(m=>typeof m==='string'?{t:m,ts:'font-size:12.5px'}:{...m,ts:'font-size:12.5px;'+(m.color?'color:'+m.color+';':'')+(m.bold?'font-weight:600':'')});
+  KV=a=>a.map(([k,v,x])=>({k,v,vs:'word-break:break-all;'+(x&&x.mono?'font-family:Consolas,monospace;font-size:12px;':'')+(x&&x.color?'color:'+x.color+';font-weight:600':'')}));
+  S(kind,o={}){const bd=o.title&&['form','kv','text'].includes(kind);
+    return {isForm:kind==='form',isKv:kind==='kv',isText:kind==='text',isBox:kind==='box',isTable:kind==='table',isBtns:kind==='btns',
+      title:o.title||'',hasTitle:!!o.title,wrap:bd?'border:1px solid #c8c8c8;background:#fcfcfc;padding:10px 12px':'',
+      fStyle:o.inline?'display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px':'display:flex;flex-direction:column;gap:8px',hasTrail:!!o.trail,...o};}
+  form=(title,fields,o={})=>this.S('form',{title,fields,...o});
+  kv=(title,a)=>this.S('kv',{title,lines:this.KV(a)});
+  txt=(title,a)=>this.S('text',{title,lines:this.L(a)});
+  box=(c,head,lines,busy)=>this.S('box',{head,lines:this.L(lines),busy:!!busy,boxStyle:'border:1px solid '+c+';background:'+({[OK]:'#f1f8f3',[ERR]:'#fdf2f1',[WARN]:'#fff8e8'}[c]||'#f3f3f3')+';padding:9px 12px;display:flex;flex-direction:column;gap:3px;color:'+INK});
+  tbl(title,cols,rows,empty){return this.S('table',{title,cols:cols.map(h=>({h})),empty,isEmpty:!rows.length,
+    rows:rows.map(r=>({onClick:r.onClick,style:(r.sel?'background:#cce4f7;':'')+(r.onClick?'cursor:pointer':''),
+      cells:r.cells.map(c=>({t:String(c.t??''),hasBtn:!!c.btn,noBtn:!c.btn,btn:c.btn,onBtn:c.onBtn,style:(c.color?'color:'+c.color+';':'')+(c.bold?'font-weight:600;':'')+(r.sel?'background:#cce4f7':'')}))}))});}
+  btn=(label,onClick,o={})=>({label,onClick,disabled:!!o.d,style:'height:28px;padding:0 16px;border-radius:3px;cursor:pointer;'+({p:'background:#0067c0;color:#fff;border:1px solid #005a9e',c:'background:#fff;color:#a4262c;border:1px solid #a4262c'}[o.k]||'background:#fdfdfd;color:#1a1a1a;border:1px solid #8a8a8a')});
+  btns=(left,right)=>this.S('btns',{left,right});
+  sortFlds=(nameLbl)=>{const u=this.state.ui;return [this.fld('정렬',u.sk,this.ui('sk'),{k:'select',inl:1,w:'110px',opts:[{v:'date',t:'등록일'},{v:'name',t:nameLbl}]}),this.fld('',u.sd,this.ui('sd'),{k:'select',inl:1,w:'100px',opts:[{v:'desc',t:'내림차순'},{v:'asc',t:'오름차순'}]})];};
+  sortL=(arr,dt,nm)=>{const {sk,sd}=this.state.ui;const g=sk==='name'?nm:dt;return [...arr].sort((a,b)=>(g(a)>g(b)?1:g(a)<g(b)?-1:0)*(sd==='asc'?1:-1));};
+  lastOf=a=>a.versions.find(v=>v.id===a.latest);
+  latestLbl=a=>{const v=this.lastOf(a);return v?'★ '+v.ver:'(미지정)';};
+  fileOf=a=>(this.lastOf(a)||a.versions[0]).file;
+  extOf=n=>n.includes('.')?n.split('.').pop().toLowerCase():'';
+  pname=id=>{const p=this.state.projects.find(x=>x.id===id);return p?p.name:'';};
+  allowedTxt=()=>this.state.exts.filter(e=>e.active).map(e=>e.ext).join(', ');
+  ask=c=>this.setState({confirm:c});
+  download=(file,ver)=>{this.log('FILE_DOWNLOAD','ver='+ver);this.ok('다운로드 완료: '+file);};
+
+  // ---- actions
+  doLogin=()=>{const {lf,users}=this.state;const u=users.find(x=>x.id===lf.id.trim());
+    if(!u||!lf.pw){this.setState({lerr:'로그인에 실패했습니다. 입력 정보를 확인하십시오',lf:{...lf,pw:''}});this.setState(s=>({logs:[{at:now(),u:lf.id.trim()||'-',op:'LOGIN_FAIL',t:lf.id.trim(),ok:false,code:'E-AUTH-401',msg:'인증 실패'},...s.logs]}));return;}
+    if(!u.active){this.setState({lerr:'로그인에 실패했습니다. 관리자에게 문의하십시오',lf:{...lf,pw:''}});return;}
+    this.setState(s=>({user:u,lerr:null,lf:{id:'',pw:''},logs:[{at:now(),u:u.id,op:'LOGIN_SUCCESS',t:u.id,ok:true},...s.logs]}));this.go('prj');};
+  logout=()=>{this.log('LOGOUT',this.state.user.id);this.setState({user:null,screen:'login',modal:null,confirm:null,msg:null});};
+  openPrj=id=>{const p=this.state.projects.find(x=>x.id===id);this.go('prjDetail',{pid:id,pf:{name:p.name,code:p.code,lamp:p.lamp,phase:p.phase,owner:p.owner,note:p.note},pe:{}});};
+  newPrj=()=>this.go('prjDetail',{pid:null,pf:{name:'',code:'',lamp:'헤드램프',phase:'개념',owner:this.state.user.name,note:''},pe:{}});
+  savePrj=()=>{const {pf,pid,projects}=this.state;const e={};
+    if(!pf.name.trim())e.name='프로젝트명: 필수 항목입니다. 프로젝트명을 입력하십시오';
+    else if(projects.some(p=>p.name===pf.name.trim()&&p.id!==pid))e.name='동일한 프로젝트명이 이미 존재합니다. 다른 프로젝트명을 입력하십시오';
+    if(!pf.code.trim())e.code='차종 코드: 필수 항목입니다. 차종 코드를 입력하십시오';
+    if(Object.keys(e).length){this.setState({pe:e});return;}
+    if(pid){this.setState(s=>({pe:{},projects:s.projects.map(p=>p.id===pid?{...p,...pf,name:pf.name.trim()}:p)}));this.ok('프로젝트가 저장되었습니다');}
+    else{const id=this.state.nid+1;this.setState(s=>({nid:id,projects:[...s.projects,P(id,pf.name.trim(),pf.code,pf.lamp,pf.phase,pf.owner,now())].map(p=>p.id===id?{...p,note:pf.note}:p)}));this.go('prjDetail',{pid:id,pe:{},msg:{k:'ok',text:'프로젝트가 등록되었습니다. 설계인자를 입력하십시오'}});}};
+  openParam=()=>{const p=this.state.projects.find(x=>x.id===this.state.pid);this.go('param',{df:{...p.params},de:{}});};
+  saveParam=()=>{const {df,pid}=this.state;const e={};
+    ['d','o','m'].forEach(k=>{if(!df[k])e[k]='필수 항목입니다. 목록에서 값을 선택하십시오';});
+    if(!String(df.n).trim())e.n='LED 개수: 필수 항목입니다. 0 이상의 정수를 입력하십시오';
+    else if(!/^\d+$/.test(df.n.trim()))e.n='LED 개수: 숫자만 입력할 수 있습니다. 0 이상의 정수를 입력하십시오';
+    if(Object.keys(e).length){this.setState({de:e});return;}
+    this.setState(s=>({projects:s.projects.map(p=>p.id===pid?{...p,params:{...df}}:p)}));this.go('prjDetail',{msg:{k:'ok',text:'설계인자가 저장되었습니다'}});};
+  cancelParam=()=>{const p=this.state.projects.find(x=>x.id===this.state.pid);
+    if(JSON.stringify(p.params)===JSON.stringify(this.state.df))return this.go('prjDetail');
+    this.ask({title:'변경 내용 폐기',target:'입력한 설계인자 변경 내용을',lines:['저장하지 않고 이 화면을 나가면 입력한 내용이 사라집니다.'],ok:'나가기',k:'c',onOk:()=>this.go('prjDetail')});};
+  offPrj=()=>{const p=this.state.projects.find(x=>x.id===this.state.pid);
+    this.ask({title:'프로젝트 사용중지',target:'"'+p.name+'"를 사용중지 처리하시겠습니까?',lines:['신규 산출물 등록 대상에서 제외됩니다.','기존 산출물은 보존됩니다.'],ok:'사용중지',k:'c',onOk:()=>{this.setState(s=>({projects:s.projects.map(x=>x.id===p.id?{...x,active:false}:x)}));this.go('prj',{msg:{k:'ok',text:'"'+p.name+'" 프로젝트가 사용중지되었습니다'}});}});};
+  offAsset=()=>{const a=this.state.assets.find(x=>x.id===this.state.aid);
+    this.ask({title:'산출물 사용중지',target:'"'+a.name+'"를 사용중지 처리하시겠습니까?',lines:['일반 사용자 화면에 표시되지 않습니다.','파일은 삭제되지 않습니다.','PoC 단계에서는 복구 기능을 제공하지 않습니다.'],ok:'사용중지',k:'c',onOk:()=>{this.setState(s=>({assets:s.assets.map(x=>x.id===a.id?{...x,active:false,off:now(),offBy:s.user.name}:x)}));this.go('assets',{msg:{k:'ok',text:'"'+a.name+'" 산출물이 사용중지되었습니다'}});}});};
+  setLatest=()=>{const {assets,aid,vid}=this.state;const a=assets.find(x=>x.id===aid),nv=a.versions.find(v=>v.id===vid),cur=this.lastOf(a);
+    this.ask({title:'최신본 지정',target:'"'+nv.ver+'" 을 최신본으로 지정하시겠습니까?',lines:['현재 최신본 : '+(cur?cur.ver:'(미지정)'),'변경 후     : '+nv.ver,'최신본은 산출물 목록과 프로젝트 상세에 대표 버전으로 표시됩니다.'],ok:'지정',k:'p',onOk:()=>{this.setState(s=>({assets:s.assets.map(x=>x.id===aid?{...x,latest:vid}:x),confirm:null}));this.ok('최신본이 변경되었습니다');}});};
+  openUpload=(pid,aid)=>{const a=aid?this.state.assets.find(x=>x.id===aid):null;
+    this.setState({modal:'upload',up:{file:'',hashing:false,busy:false,result:null,err:{},name:a?a.name:'',pid:a?a.pid:(pid||''),kind:a?a.kind:'',stage:a?a.stage:'',ver:'',aid:aid||null,info:null}});};
+  upd=o=>this.setState(s=>({up:{...s.up,...o}}));
+  upf=k=>e=>{const v=e.target.value;this.setState(s=>({up:{...s.up,[k]:v,err:{...s.up.err,[k]:null}}}));};
+  pickFile=e=>{const n=e.target.value;if(!n){this.upd({file:'',info:null,hashing:false,result:null});return;}
+    const f=FILES.find(x=>x.n===n);this.upd({file:n,hashing:true,info:null,result:null});
+    setTimeout(()=>this.upd({hashing:false,info:{name:f.n,ext:this.extOf(f.n),size:f.s,sha:hx(f.n+f.s),bad:!!f.bad}}),900);};
+  doUpload=()=>{const s=this.state,u=s.up,e={};
+    if(!u.file||!u.info)e.file='파일: 필수 항목입니다. 업로드할 파일을 선택하십시오';
+    else if(!s.exts.some(t=>t.active&&t.ext===u.info.ext))e.file='허용된 파일 형식이 아닙니다. 허용 확장자: '+this.allowedTxt();
+    else if(u.info.size===0)e.file='빈 파일은 업로드할 수 없습니다';
+    const req='필수 항목입니다. 값을 입력하십시오';
+    if(!u.name.trim())e.name='문서명: '+req;if(!u.pid)e.pid='연결 프로젝트: 목록에서 선택하십시오';if(!u.kind)e.kind='산출물 종류: 목록에서 선택하십시오';if(!u.stage)e.stage='설계 단계: 목록에서 선택하십시오';
+    if(!u.ver.trim())e.ver='버전값: '+req+' (예: v1, v2)';
+    else if(u.aid&&s.assets.find(a=>a.id===u.aid).versions.some(v=>v.ver===u.ver.trim()))e.ver='동일 버전값이 이미 존재합니다. 다른 버전값을 입력하십시오';
+    if(Object.keys(e).length){this.upd({err:e});if(e.file&&u.info)this.log('FILE_UPLOAD',u.info.name,false,'E-EXT-415','허용되지 않는 파일');return;}
+    this.upd({busy:true,err:{},result:null});
+    setTimeout(()=>{const x=u.info;
+      if(x.bad){this.upd({busy:false,result:{ok:false,ss:x.size-512,sh:hx('corrupt'+x.sha)}});this.log('FILE_UPLOAD',x.name,false,'E-HASH-422','무결성 검증 불일치 (SHA-256)');return;}
+      const nid=this.state.nid+2,ver=V(nid,u.ver.trim(),x.name,x.size,this.state.user.name,now());ver.sha=x.sha;let aid=u.aid;
+      if(aid)this.setState(st=>({nid,assets:st.assets.map(a=>a.id===aid?{...a,versions:[ver,...a.versions]}:a)}));
+      else{aid=nid+1;this.setState(st=>({nid:nid+1,assets:[{id:aid,name:u.name.trim(),pid:+u.pid,kind:u.kind,stage:u.stage,active:true,latest:null,versions:[ver]},...st.assets]}));}
+      this.upd({busy:false,result:{ok:true}});this.log('FILE_UPLOAD','asset='+aid+' ver='+nid);
+      setTimeout(()=>{if(this.state.modal==='upload')this.go('assetDetail',{aid,msg:{k:'ok',text:'업로드가 완료되었습니다. 최신본은 [버전 목록 상세]에서 지정하십시오'}});},1600);},1000);};
+  cancelUpload=()=>{const u=this.state.up;if(u.busy)return;
+    if(u.file||u.name&&!u.aid||u.ver)this.ask({title:'업로드 취소',target:'입력한 내용을 폐기하시겠습니까?',lines:['선택한 파일과 입력한 메타데이터가 사라집니다.'],ok:'폐기',k:'c',onOk:()=>this.setState({modal:null,confirm:null,up:null})});
+    else this.setState({modal:null});};
+  openUser=u=>this.setState({modal:'user',ue:{},uf:u?{mode:'edit',id:u.id,name:u.name,role:u.role,active:u.active,pw:'',pw2:'',orig:u}:{mode:'new',id:'',name:'',role:'USER',active:true,pw:'',pw2:''}});
+  saveUser=()=>{const {uf,users}=this.state;const e={};
+    if(!uf.id.trim())e.id='로그인 ID: 필수 항목입니다';else if(uf.mode==='new'&&users.some(u=>u.id===uf.id.trim()))e.id='동일한 로그인 ID가 이미 존재합니다. 다른 ID를 입력하십시오';
+    if(!uf.name.trim())e.name='성명: 필수 항목입니다';
+    if(uf.mode==='new'&&!uf.pw)e.pw='비밀번호: 등록 시 필수 항목입니다';
+    if(uf.pw!==uf.pw2)e.pw2='비밀번호 확인: 비밀번호가 일치하지 않습니다. 다시 입력하십시오';
+    if(uf.mode==='edit'&&uf.orig.role==='ADMIN'&&(uf.role!=='ADMIN'||!uf.active)&&users.filter(u=>u.role==='ADMIN'&&u.active).length<=1)e.gen='관리자 계정이 1명 이하가 될 수 없습니다';
+    if(Object.keys(e).length){this.setState({ue:e});return;}
+    const apply=()=>{this.setState(s=>({confirm:null,modal:null,users:uf.mode==='new'?[...s.users,{id:uf.id.trim(),name:uf.name.trim(),role:uf.role,active:uf.active,at:now().slice(0,10)}]:s.users.map(u=>u.id===uf.id?{...u,name:uf.name.trim(),role:uf.role,active:uf.active}:u)}));this.ok('사용자 정보가 저장되었습니다');};
+    if(uf.mode==='edit'&&(uf.role!==uf.orig.role||uf.active!==uf.orig.active))this.ask({title:'사용자 역할·활성 변경',target:uf.name+' ('+uf.id+') 의 권한이 변경됩니다.',lines:['역할: '+ROLE[uf.orig.role]+' → '+ROLE[uf.role],'활성: '+(uf.orig.active?'활성':'비활성')+' → '+(uf.active?'활성':'비활성')],ok:'변경',k:'p',onOk:apply});
+    else apply();};
+  addExt=()=>{const {ui,exts}=this.state;const v=ui.ext.trim().toLowerCase();let e='';
+    if(!v)e='확장자: 필수 항목입니다. 점 없이 입력하십시오 (예: xmp)';else if(/[.\s]/.test(v))e='확장자: 점·공백을 포함할 수 없습니다. 점 없이 입력하십시오 (예: xmp)';else if(exts.some(x=>x.ext===v))e='이미 등록된 확장자입니다: '+v;
+    if(e){this.setState(s=>({ui:{...s.ui,extErr:e}}));return;}
+    this.setState(s=>({exts:[...s.exts,{ext:v,active:true}],ui:{...s.ui,ext:'',extErr:''}}));this.ok('확장자 "'+v+'" 이(가) 등록되었습니다');};
+  runSearch=()=>{const q=this.state.ui.sq;if(q.from&&q.to&&q.from>q.to){this.setState(s=>({ui:{...s.ui,sErr:'시작일이 종료일보다 늦습니다. 기간을 다시 선택하십시오',applied:null}}));return;}
+    this.setState(s=>({row:null,ui:{...s.ui,sErr:'',applied:{...q}}}));};
+  resetSearch=()=>this.setState(s=>({row:null,ui:{...s.ui,sq:{name:'',p:'all',k:'all',from:'',to:''},applied:null,sErr:''}}));
+
+  // ---- views
+  vPrj(adm){const {projects,assets,ui}=this.state;
+    let l=projects.filter(p=>(adm&&ui.off||p.active)&&p.name.includes(ui.prjQ.trim()));l=this.sortL(l,p=>p.created,p=>p.name);
+    const rows=l.map(p=>({onClick:()=>this.openPrj(p.id),cells:[{t:p.name},{t:[p.code,p.lamp,p.phase,p.owner].join(' · ')},{t:assets.filter(a=>a.pid===p.id&&a.active).length},{t:p.created.slice(0,10)},{t:p.active?'사용':'사용중지',color:p.active?'':WARN}]}));
+    const f=[this.fld('프로젝트명',ui.prjQ,this.ui('prjQ'),{inl:1,w:'220px'})];if(adm)f.push(this.fld('사용중지 포함 (관리자)',ui.off,this.ui('off'),{k:'check'}));
+    return {title:'차종 프로젝트 목록',sections:[this.form('',f,{inline:1}),
+      this.tbl('',['프로젝트명','기본정보 요약','산출물수','등록일','상태'],rows,ui.prjQ?'검색 조건에 해당하는 프로젝트가 없습니다':'등록된 프로젝트가 없습니다. [신규 프로젝트 등록]으로 시작하십시오'),
+      this.form('',this.sortFlds('프로젝트명'),{inline:1,trail:'총 '+rows.length+'건   < 1 / 1 >'}),
+      this.btns([],[this.btn('신규 프로젝트 등록',this.newPrj,{k:'p'})])]};}
+  vPrjDetail(){const {pid,pf,pe,projects,assets}=this.state;const p=projects.find(x=>x.id===pid),isNew=!p,off=p&&!p.active,F=this.frm.bind(this,'pf');
+    const secs=[];
+    if(off)secs.push(this.box(WARN,'! 이 프로젝트는 사용중지 상태입니다',[]));
+    secs.push(this.form('기본정보',[
+      this.fld('프로젝트명',pf.name,F('name'),{req:1,err:pe.name,ro:off}),
+      this.fld('차종 코드',pf.code,F('code'),{req:1,err:pe.code,ro:off,hint:'[TBD-2] 기본정보 5필드는 요구사항 확정 시 변경될 수 있습니다'}),
+      this.fld('램프 구분',pf.lamp,F('lamp'),{k:'select',opts:['헤드램프','리어램프','DRL','안개등'],ro:off}),
+      this.fld('개발 단계',pf.phase,F('phase'),{k:'select',opts:STAGES,ro:off}),
+      this.fld('담당 설계자',pf.owner,F('owner'),{ro:off}),
+      this.fld('비고',pf.note,F('note'),{ro:off}),
+      ...(p?[this.fld('등록 정보',p.created+' 등록',null,{k:'static'})]:[])]));
+    secs.push(this.btns(isNew?[]:[this.btn('사용중지',this.offPrj,{k:'c',d:off})],[this.btn('저장',this.savePrj,{k:'p',d:off})]));
+    if(isNew){secs.push(this.txt('고정 설계인자',[{t:'프로젝트 저장 후 입력 가능합니다.',color:MUT}]));secs.push(this.txt('연계 산출물',[{t:'프로젝트 저장 후 입력 가능합니다.',color:MUT}]));}
+    else{const pr=p.params,sum=pr.d?`디자인: ${pr.d} / 광학계: ${pr.o} / LED 제조사: ${pr.m} / LED 개수: ${pr.n}`:'입력된 설계인자가 없습니다.';
+      secs.push(this.S('text',{title:'고정 설계인자',lines:this.L([{t:sum,color:pr.d?INK:MUT}]),wrap:'border:1px solid #c8c8c8;background:#fcfcfc;padding:10px 12px'}));
+      secs.push(this.btns([],[this.btn('설계인자 입력·변경 >',this.openParam,{d:off})]));
+      const al=assets.filter(a=>a.pid===pid&&a.active);
+      secs.push(this.tbl('연계 산출물 (총 '+al.length+'건)',['문서명','종류','단계','최신버전','등록일시'],al.map(a=>({onClick:()=>this.go('assetDetail',{aid:a.id}),cells:[{t:a.name},{t:a.kind},{t:a.stage},{t:this.latestLbl(a),bold:1,color:this.lastOf(a)?'':WARN},{t:a.versions[0].at}]})),'연결된 산출물이 없습니다. [산출물 업로드]로 등록하십시오'));
+      secs.push(this.btns([],[this.btn('전체 보기 >',()=>this.go('assets',{ui:{...this.state.ui,aF:String(pid),sk:'date',sd:'desc'}})),this.btn('산출물 업로드',()=>this.openUpload(pid),{k:'p',d:off})]));}
+    return {title:isNew?'프로젝트 등록':'프로젝트 상세 : '+p.name,back:'목록으로',onBack:()=>this.go('prj'),sections:secs};}
+  vParam(){const {df,de,projects,pid}=this.state,p=projects.find(x=>x.id===pid),F=this.frm.bind(this,'df');
+    const sel=(l,k,o)=>this.fld(l,df[k],F(k),{k:'select',req:1,err:de[k],opts:[{v:'',t:'(선택)'},...o]});
+    const errs=Object.values(de);
+    return {title:'고정 설계인자 : '+p.name,back:'< 프로젝트 상세',onBack:this.cancelParam,sections:[
+      this.form('',[sel('디자인','d',['A타입','B타입','C타입']),sel('광학계','o',['리플렉터','프로젝션','렌즈 일체형']),sel('LED 제조사','m',['XX사','YY사','ZZ사']),
+        this.fld('LED 개수',df.n,F('n'),{req:1,err:de.n,w:'120px',hint:'정수만 입력합니다 (단위: 개)'}),
+        ...[5,6,7,8,9,10].map(i=>this.fld('필드'+i,df['f'+i],F('f'+i),{hint:i===5?'[TBD-3] 나머지 6필드는 확정 시 항목명·입력 형식이 정해집니다':''}))]),
+      ...(errs.length?[this.box(ERR,'! 입력값을 확인하십시오',errs)]:[]),
+      this.btns([],[this.btn('저장',this.saveParam,{k:'p'}),this.btn('취소',this.cancelParam)])]};}
+  vAssets(adm){const {assets,ui,projects}=this.state;
+    let l=assets.filter(a=>(a.active||adm&&ui.off)&&(ui.aF==='all'||String(a.pid)===ui.aF));l=this.sortL(l,a=>a.versions[0].at,a=>this.fileOf(a).toLowerCase());
+    const rows=l.map(a=>({onClick:()=>this.go('assetDetail',{aid:a.id}),cells:[{t:a.name+(a.active?'':' (사용중지)'),color:a.active?'':WARN},{t:this.fileOf(a)},{t:this.extOf(this.fileOf(a))},{t:fmt((this.lastOf(a)||a.versions[0]).size)},{t:this.pname(a.pid)},{t:a.kind},{t:a.stage},{t:this.latestLbl(a),bold:1,color:this.lastOf(a)?'':WARN},{t:a.versions[0].by},{t:a.versions[0].at.slice(0,10)}]}));
+    const f=[this.fld('프로젝트',ui.aF,this.ui('aF'),{k:'select',inl:1,w:'220px',opts:[{v:'all',t:'전체'},...projects.filter(p=>p.active).map(p=>({v:String(p.id),t:p.name}))]})];if(adm)f.push(this.fld('사용중지 포함 (관리자)',ui.off,this.ui('off'),{k:'check'}));
+    return {title:'산출물 목록',sections:[this.form('',f,{inline:1}),
+      this.tbl('',['문서명','원본파일명','확장자','크기','프로젝트','종류','설계 단계','최신버전','등록자','등록일'],rows,'조건에 해당하는 산출물이 없습니다'),
+      this.form('',this.sortFlds('파일명'),{inline:1,trail:'총 '+rows.length+'건   < 1 / 1 >'}),
+      this.btns([],[this.btn('산출물 업로드',()=>this.openUpload(ui.aF==='all'?null:+ui.aF),{k:'p'})])]};}
+  vAsset(adm){const {assets,aid,user}=this.state;const a=assets.find(x=>x.id===aid),lv=this.lastOf(a),secs=[];
+    if(!a.active)secs.push(this.box(WARN,'! 이 산출물은 사용중지 상태입니다',['처리일시: '+a.off+'  /  처리자: '+a.offBy]));
+    const m=lv||a.versions[0];
+    secs.push(this.kv('메타데이터',[['문서명',a.name],['연결 프로젝트',this.pname(a.pid)],['산출물 종류',a.kind],['설계 단계',a.stage],['원본 파일명',m.file],['확장자',this.extOf(m.file)],['크기',fmt(m.size)+' ('+num(m.size)+' bytes)'],['SHA-256',m.sha,{mono:1}],['등록자',m.by],['등록일시',m.at]]));
+    secs.push(this.txt('',[{t:'메타데이터 수정은 본개발 범위입니다.',color:MUT}]));
+    if(lv)secs.push(this.S('kv',{title:'최신본 정보',lines:this.KV([['최신본','★ '+lv.ver+' (최신본)',{color:OK}]]),wrap:'border:1px solid #c8c8c8;background:#fcfcfc;padding:10px 12px'}));
+    else secs.push(this.box(WARN,'! 최신본이 지정되지 않았습니다',['[버전 목록 상세]에서 최신본을 지정하십시오.']));
+    secs.push(this.btns([],[this.btn('최신본 다운로드',()=>this.download(lv.file,lv.id),{k:'p',d:!lv})]));
+    secs.push(this.tbl('버전 (총 '+a.versions.length+'개)',['최신본','버전값','등록일시','등록자','크기'],a.versions.map(v=>({cells:[{t:v.id===a.latest?'★ 최신본':'',bold:1,color:OK},{t:v.ver},{t:v.at},{t:v.by},{t:fmt(v.size)}]})),''));
+    secs.push(this.btns([this.btn('사용중지',this.offAsset,{k:'c',d:!a.active})],[this.btn('버전 목록 상세 >',()=>this.go('ver',{vid:lv?lv.id:null})),this.btn('신규 버전 추가',()=>this.openUpload(a.pid,a.id),{k:'p',d:!a.active})]));
+    return {title:'산출물 상세',back:'< 목록',onBack:()=>this.go(a.active?'assets':'inactive'),sections:secs};}
+  vVer(){const {assets,aid,vid}=this.state;const a=assets.find(x=>x.id===aid),sv=a.versions.find(v=>v.id===vid),isL=sv&&sv.id===a.latest;
+    const secs=[];if(!a.latest)secs.push(this.box(WARN,'! 최신본이 지정되지 않았습니다',['버전을 선택하여 지정하십시오.']));
+    secs.push(this.tbl('',['최신본','버전값','원본 파일명','크기','등록자','등록일시'],a.versions.map(v=>({sel:v.id===vid,onClick:()=>this.setState({vid:v.id}),cells:[{t:v.id===a.latest?'★ 최신본':'',bold:1,color:OK},{t:v.ver},{t:v.file},{t:fmt(v.size)},{t:v.by},{t:v.at}]})),''));
+    secs.push(sv?this.kv('선택 버전: '+sv.ver,[['SHA-256',sv.sha,{mono:1}],['크기',num(sv.size)+' bytes']]):this.txt('선택 버전',[{t:'표에서 버전을 선택하십시오.',color:MUT}]));
+    secs.push(this.txt('',[{t:'버전값과 최신본은 사용자가 직접 입력·지정합니다.',color:MUT},...(isL?[{t:'이미 최신본입니다.',color:OK,bold:1}]:[])]));
+    secs.push(this.btns([],[this.btn('이 버전을 최신본으로 지정',this.setLatest,{k:'p',d:!sv||isL}),this.btn('선택 버전 다운로드',()=>this.download(sv.file,sv.id),{d:!sv})]));
+    return {title:'버전 목록 : '+a.name,back:'< 산출물 상세',onBack:()=>this.go('assetDetail'),sections:secs};}
+  vSearch(){const {ui,assets,projects,row}=this.state,q=ui.sq,ap=ui.applied;let rows=[];
+    if(ap){let r=[];assets.filter(a=>a.active).forEach(a=>a.versions.forEach(v=>r.push({a,v})));
+      r=r.filter(({a,v})=>(!ap.name||v.file.toLowerCase().includes(ap.name.trim().toLowerCase()))&&(ap.p==='all'||String(a.pid)===ap.p)&&(ap.k==='all'||a.kind===ap.k)&&(!ap.from||v.at.slice(0,10)>=ap.from)&&(!ap.to||v.at.slice(0,10)<=ap.to));
+      r=this.sortL(r,x=>x.v.at,x=>x.v.file.toLowerCase());
+      rows=r.map(({a,v})=>({sel:row===v.id,onClick:()=>this.setState({row:v.id,aid:a.id}),cells:[{t:a.name},{t:v.file},{t:this.pname(a.pid)},{t:a.kind},{t:a.stage},{t:(v.id===a.latest?'★ ':'')+v.ver,bold:v.id===a.latest},{t:v.by},{t:v.at.slice(0,10)}],v,a}));}
+    const sel=rows.find(r=>r.v.id===row);
+    const cond=ap?'적용 조건: '+[ap.name&&'파일명="'+ap.name+'"',ap.p!=='all'&&'프로젝트='+this.pname(+ap.p),ap.k!=='all'&&'종류='+ap.k,(ap.from||ap.to)&&'등록기간='+(ap.from||'…')+'~'+(ap.to||'…')].filter(Boolean).join(', ')||'적용 조건: 없음 (전체 조회)':'';
+    return {title:'검색',sections:[
+      this.form('검색 조건',[this.fld('원본 파일명',q.name,this.sq('name'),{hint:'PoC 단계에서는 원본 파일명 기준 검색만 지원합니다 (문서명·메타데이터 검색은 본개발 범위)'}),
+        this.fld('프로젝트',q.p,this.sq('p'),{k:'select',opts:[{v:'all',t:'전체'},...projects.map(p=>({v:String(p.id),t:p.name}))]}),
+        this.fld('산출물 종류',q.k,this.sq('k'),{k:'select',opts:[{v:'all',t:'전체'},...KINDS]}),
+        this.fld('등록기간 시작',q.from,this.sq('from'),{k:'date',w:'160px'}),this.fld('등록기간 종료',q.to,this.sq('to'),{k:'date',w:'160px',err:ui.sErr})]),
+      this.btns([],[this.btn('조건 초기화',this.resetSearch),this.btn('검색',this.runSearch,{k:'p'})]),
+      ...(ap?[this.txt('',[{t:cond,color:MUT}]),
+        this.tbl('',['문서명','원본파일명','프로젝트','종류','설계 단계','버전','등록자','등록일'],rows,'검색 조건에 해당하는 산출물이 없습니다. 조건을 완화하여 다시 검색하십시오'),
+        this.form('',this.sortFlds('파일명'),{inline:1,trail:'총 '+rows.length+'건   < 1 / 1 >'}),
+        this.btns([],[this.btn('상세 보기',()=>this.go('assetDetail',{aid:sel.a.id}),{d:!sel}),this.btn('다운로드',()=>this.download(sel.v.file,sel.v.id),{k:'p',d:!sel})])]
+        :[this.txt('',[{t:'검색 조건을 입력하고 [검색]을 누르십시오. 조건 없이 검색하면 전체를 조회합니다.',color:MUT}])])]};}
+  vUsers(){const {users}=this.state;
+    return {title:'사용자 관리',sections:[this.tbl('',['로그인ID','성명','역할','활성여부','등록일'],users.map(u=>({onClick:()=>this.openUser(u),cells:[{t:u.id},{t:u.name},{t:ROLE[u.role]},{t:u.active?'활성':'비활성',color:u.active?'':WARN},{t:u.at}]})),''),
+      this.txt('',['총 '+users.length+'건   < 1 / 1 >']),this.btns([],[this.btn('사용자 등록',()=>this.openUser(null),{k:'p'})])]};}
+  vInactive(){const {assets,row}=this.state;const l=assets.filter(a=>!a.active),sel=l.find(a=>a.id===row);
+    return {title:'사용중지 산출물 목록 (관리자)',sections:[this.tbl('',['문서명','원본파일명','프로젝트','사용중지일시','처리자'],l.map(a=>({sel:row===a.id,onClick:()=>this.setState({row:a.id}),cells:[{t:a.name},{t:this.fileOf(a)},{t:this.pname(a.pid)},{t:a.off},{t:a.offBy}]})),'사용중지된 산출물이 없습니다'),
+      this.btns([],[this.btn('상세 보기',()=>this.go('assetDetail',{aid:sel.id}),{d:!sel})]),
+      this.txt('',[{t:'PoC 단계에서는 복구 및 영구삭제 기능을 제공하지 않습니다.',color:MUT}])]};}
+  vExt(){const {exts,ui}=this.state;
+    return {title:'허용 확장자 관리 (관리자)',sections:[
+      this.form('',[this.fld('신규 확장자',ui.ext,this.ui('ext'),{inline:1,inl:1,w:'140px',err:ui.extErr,hint:'점 없이 입력합니다. 예: xmp'})],{inline:1}),this.btns([],[this.btn('등록',this.addExt,{k:'p'})]),
+      this.tbl('',['확장자','활성여부','처리'],exts.map(e=>({cells:[{t:e.ext},{t:e.active?'활성':'비활성',color:e.active?'':WARN},{btn:e.active?'비활성화':'활성화',onBtn:()=>this.setState(s=>({exts:s.exts.map(x=>x.ext===e.ext?{...x,active:!x.active}:x)}))}]})),''),
+      this.txt('',[{t:'확장자 형식별 개별 처리(파싱·변환·미리보기)는 수행하지 않습니다. 비활성 확장자는 업로드가 차단됩니다.',color:MUT}])]};}
+  vLog(){const {logs,row}=this.state;const sel=logs.find((l,i)=>i===row);
+    return {title:'로그 조회 (관리자)',sections:[this.tbl('',['발생일시','사용자','작업유형','대상','결과','오류코드','오류내용'],logs.slice(0,20).map((l,i)=>({sel:row===i,onClick:()=>this.setState({row:i}),cells:[{t:l.at},{t:l.u},{t:OPLBL[l.op]},{t:l.t},{t:l.ok?'성공':'실패',color:l.ok?OK:ERR,bold:1},{t:l.code||''},{t:l.msg||''}]})),'기록된 로그가 없습니다'),
+      this.txt('',[{t:sel&&sel.msg?'선택 로그 오류내용: '+sel.msg:'행을 선택하면 오류내용이 표시됩니다.',color:MUT},'최신순   총 '+logs.length+'건   < 1 / 1 >',{t:'PoC 단계에서는 조건 검색(사용자·기간·작업·성공여부)을 제공하지 않습니다.',color:MUT}])]};}
+
+  // ---- modals
+  mLogin(){const {lf,lerr}=this.state;
+    return {title:'로그인',w:440,noClose:1,sections:[this.txt('',[{t:'램프광학 설계정보 및 산출물 통합관리 (PoC)',bold:1}]),
+      this.form('',[this.fld('로그인 ID',lf.id,this.frm('lf','id'),{req:1}),this.fld('비밀번호',lf.pw,this.frm('lf','pw'),{k:'pass',req:1})]),
+      ...(lerr?[this.box(ERR,'! '+lerr,[])]:[]),
+      this.btns([this.btn('서버 설정',()=>this.setState({lerr:'서버 설정은 이 프로토타입에서 제공하지 않습니다'}))],[this.btn('로그인',this.doLogin,{k:'p'})]),
+      this.txt('',[{t:'프로토타입 안내: designer01 / designer02 (일반 사용자), admin (관리자). 비밀번호는 아무 값이나 입력합니다.',color:MUT}])],bg:'#c9ced4'};}
+  mUpload(){const {up:u,projects,exts}=this.state,e=u.err||{},F=this.upf,lock=u.busy||(u.result&&u.result.ok),ro=!!u.aid||lock,x=u.info;
+    const secs=[this.form('1. 파일 선택',[this.fld('파일',u.file,this.pickFile,{k:'select',req:1,err:e.file,ro:lock,opts:[{v:'',t:'[파일 선택...] (OS 파일 대화상자 시뮬레이션)'},...FILES.map(f=>({v:f.n,t:f.n+'  ('+fmt(f.s)+')'}))],hint:'허용 확장자: '+this.allowedTxt()})])];
+    secs.push(u.hashing?this.S('box',{title:'2. 자동 수집 정보',head:'파일 정보를 확인하고 있습니다...',lines:[],busy:1,boxStyle:'padding:4px 0',wrap:'border:1px solid #c8c8c8;background:#fcfcfc;padding:10px 12px'})
+      :this.kv('2. 자동 수집 정보 (입력 불가 - 자동 생성)',x?[['원본 파일명',x.name],['확장자',x.ext],['파일 크기',fmt(x.size)+' ('+num(x.size)+' bytes)'],['SHA-256',x.sha,{mono:1}],['등록자',this.state.user.name+'   (등록일시: 저장 시 서버 시각)']]:[['안내','파일을 선택하면 자동으로 채워집니다']]));
+    secs.push(this.form('3. 메타데이터 입력',[this.fld('문서명',u.name,F('name'),{req:1,err:e.name,ro}),
+      this.fld('연결 프로젝트',u.pid,F('pid'),{k:'select',req:1,err:e.pid,ro,opts:[{v:'',t:'(선택)'},...projects.filter(p=>p.active||String(p.id)===String(u.pid)).map(p=>({v:String(p.id),t:p.name}))]}),
+      this.fld('산출물 종류',u.kind,F('kind'),{k:'select',req:1,err:e.kind,ro,opts:[{v:'',t:'(선택)'},...KINDS]}),
+      this.fld('설계 단계',u.stage,F('stage'),{k:'select',req:1,err:e.stage,ro,opts:[{v:'',t:'(선택)'},...STAGES]}),
+      this.fld('버전값',u.ver,F('ver'),{req:1,err:e.ver,ro:lock,w:'140px',hint:'직접 입력합니다 (예: v1, v2)'})]));
+    const r=u.result;
+    if(u.busy)secs.push(this.box('#6a6a6a','업로드 중...',['무결성을 검증하고 있습니다. 잠시 기다려 주십시오.'],1));
+    else if(r&&r.ok)secs.push(this.S('box',{title:'4. 무결성 검증 결과',...this.box(OK,'✔ 무결성 검증 완료',['파일 크기 : '+num(x.size)+'  =  '+num(x.size)+'      [일치]','SHA-256   : '+x.sha.slice(0,8)+'...  =  '+x.sha.slice(0,8)+'...      [일치]']),wrap:''}));
+    else if(r)secs.push(this.S('box',{...this.box(ERR,'✖ 무결성 검증 실패. 파일이 저장되지 않았습니다',['파일 크기 : '+num(x.size)+'  ≠  '+num(r.ss)+'      [불일치]','SHA-256   : '+x.sha.slice(0,8)+'...  ≠  '+r.sh.slice(0,8)+'...      [불일치]','파일을 다시 선택하여 재시도하십시오.']),wrap:''}));
+    secs.push(this.btns([],[this.btn('업로드',this.doUpload,{k:'p',d:lock||u.hashing}),this.btn('취소',this.cancelUpload,{d:lock})]));
+    return {title:(u.aid?'신규 버전 업로드':'산출물 업로드'),w:720,sections:secs,onClose:this.cancelUpload};}
+  mUser(){const {uf,ue}=this.state,F=this.frm.bind(this,'uf'),ed=uf.mode==='edit';
+    return {title:ed?'사용자 편집':'사용자 등록',w:480,onClose:()=>this.setState({modal:null}),sections:[
+      this.form('',[this.fld('로그인 ID',uf.id,F('id'),{req:1,err:ue.id,ro:ed,hint:ed?'편집 시 변경할 수 없습니다':''}),this.fld('성명',uf.name,F('name'),{req:1,err:ue.name}),
+        this.fld('역할',uf.role,F('role'),{k:'select',req:1,opts:[{v:'ADMIN',t:'관리자'},{v:'USER',t:'일반 사용자'}]}),this.fld('활성 여부',uf.active,F('active'),{k:'check'}),
+        this.fld('비밀번호',uf.pw,F('pw'),{k:'pass',req:!ed,err:ue.pw,hint:ed?'입력하면 재설정됩니다':''}),this.fld('비밀번호 확인',uf.pw2,F('pw2'),{k:'pass',err:ue.pw2})]),
+      this.box(WARN,'! 비밀번호 정책 : [TBD-1] 확정 후 표시',[]),
+      ...(ue.gen?[this.box(ERR,'✖ '+ue.gen,['관리자 역할과 활성 상태를 유지하십시오.'])]:[]),
+      this.btns([],[this.btn('저장',this.saveUser,{k:'p'}),this.btn('취소',()=>this.setState({modal:null}))])]};}
+  mConfirm(){const c=this.state.confirm;
+    return {title:c.title,w:440,onClose:()=>this.setState({confirm:null}),sections:[this.txt('',[{t:c.target,bold:1},...c.lines]),this.btns([],[this.btn(c.ok,c.onOk,{k:c.k}),this.btn('취소',()=>this.setState({confirm:null}))])]};}
+
+  renderVals(){
+    const s=this.state,u=s.user,adm=u&&u.role==='ADMIN',layers=[];
+    const modalLayer=(m,z)=>({isModal:true,isPage:false,title:m.title,hasClose:!m.noClose,onClose:m.onClose,sections:m.sections,
+      wrap:'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:'+z+';background:'+(m.bg||'rgba(0,0,0,.32)'),
+      box:`width:${m.w}px;max-width:96%;max-height:94%;overflow:auto;background:#f3f3f3;border:1px solid #6a6a6a;box-shadow:0 8px 30px rgba(0,0,0,.35);display:flex;flex-direction:column`,
+      inner:'padding:14px 16px;display:flex;flex-direction:column;gap:12px'});
+    if(u){const V={prj:()=>this.vPrj(adm),prjDetail:()=>this.vPrjDetail(),param:()=>this.vParam(),assets:()=>this.vAssets(adm),assetDetail:()=>this.vAsset(adm),ver:()=>this.vVer(),search:()=>this.vSearch(),users:()=>this.vUsers(),inactive:()=>this.vInactive(),ext:()=>this.vExt(),log:()=>this.vLog()}[s.screen]();
+      const secs=[...(s.msg?[this.box(s.msg.k==='ok'?OK:ERR,(s.msg.k==='ok'?'✔ ':'✖ ')+s.msg.text,[])]:[]),...V.sections];
+      layers.push({isPage:true,isModal:false,title:V.title,hasBack:!!V.back,backLabel:V.back,onBack:V.onBack,sections:secs,wrap:'position:absolute;left:200px;right:0;top:0;bottom:0;overflow:auto',box:'min-width:0',inner:'padding:14px 20px 24px;display:flex;flex-direction:column;gap:12px'});}
+    if(!u)layers.push(modalLayer(this.mLogin(),30));
+    if(u&&s.modal==='upload')layers.push(modalLayer(this.mUpload(),20));
+    if(u&&s.modal==='user')layers.push(modalLayer(this.mUser(),20));
+    if(s.confirm)layers.push(modalLayer(this.mConfirm(),40));
+    const sc=s.screen,mi=(label,screen,act)=>({label,style:'padding:5px 10px 5px 28px;cursor:pointer;'+(act.includes(sc)?'background:#cce4f7;font-weight:600':''),onClick:()=>this.go(screen)}),hd=l=>({label:l,style:'padding:9px 10px 3px;font-weight:600;color:#333'});
+    const menu=u?[hd('1. 차종 프로젝트'),mi('프로젝트 목록','prj',['prj','prjDetail','param']),hd('2. 산출물'),mi('산출물 목록','assets',['assets','assetDetail','ver']),hd('3. 검색'),mi('검색','search',['search']),
+      ...(adm?[hd('4. 관리자'),mi('사용자 관리','users',['users']),mi('사용중지 산출물','inactive',['inactive']),mi('허용 확장자','ext',['ext']),mi('로그 조회','log',['log'])]:[])]:[];
+    return {menu,layers,userText:u?u.name+' ('+ROLE[u.role]+')':'미접속',serverText:u?'연결됨':'-',dbText:u?'정상':'-',noUser:!u,logout:this.logout};
+  }
+}
+</script>
+</body>
+</html>
